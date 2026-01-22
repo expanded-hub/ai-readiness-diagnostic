@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Readiness Diagnostic | Nubien</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff 0%, #7C5CFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #999;
+            margin-bottom: 3rem;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-card {
+            background: #111111;
+            border: 1px solid #222222;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: border-color 0.3s ease;
+        }
+
+        .question-card:hover {
+            border-color: #7C5CFF;
+        }
+
+        .question-number {
+            color: #7C5CFF;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            color: #ffffff;
+        }
+
+        .slider-container {
+            margin: 25px 0;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .slider-label {
+            flex: 1;
+            text-align: center;
+        }
+
+        .slider-label:first-child {
+            text-align: left;
+        }
+
+        .slider-label:last-child {
+            text-align: right;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #222222;
+            outline: none;
+            -webkit-appearance: none;
+            margin: 20px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #7C5CFF;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(124, 92, 255, 0.6);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #7C5CFF;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(124, 92, 255, 0.6);
+        }
+
+        .range-value {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #7C5CFF;
+            margin-top: 10px;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .btn {
+            background: #7C5CFF;
+            color: #ffffff;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background: #6A4FE8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(124, 92, 255, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .results-container {
+            text-align: center;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #7C5CFF 0%, #5C3FCC 100%);
+            border-radius: 20px;
+            padding: 50px 30px;
+            margin: 40px 0;
+        }
+
+        .score-number {
+            font-size: 5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .maturity-level {
+            background: #111111;
+            border: 2px solid #7C5CFF;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .maturity-title {
+            font-size: 2rem;
+            color: #7C5CFF;
+            margin-bottom: 10px;
+        }
+
+        .blocker-section {
+            background: #111111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .blocker-title {
+            font-size: 1.3rem;
+            color: #7C5CFF;
+            margin-bottom: 15px;
+        }
+
+        .blocker-item {
+            font-size: 1.1rem;
+            color: #ffffff;
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #7C5CFF;
+        }
+
+        .email-form {
+            display: none;
+            background: #111111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 40px;
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .email-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            background: #000000;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #7C5CFF;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #222222;
+            border-radius: 2px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7C5CFF 0%, #5C3FCC 100%);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+            }
+
+            .score-number {
+                font-size: 3.5rem;
+            }
+
+            .maturity-title {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                padding: 20px 10px;
+            }
+
+            .question-card {
+                padding: 20px;
+            }
+        }
+
+        .success-message {
+            background: #111111;
+            border: 2px solid #7C5CFF;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .success-message.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .success-message h3 {
+            color: #7C5CFF;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Questions Page -->
+        <div id="questionsPage" class="page active">
+            <h1>AI Readiness Diagnostic</h1>
+            <p class="subtitle">Discover your AI maturity level and unlock your potential</p>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+
+            <!-- Question 1 -->
+            <div class="question-card">
+                <div class="question-number">Question 1 of 6</div>
+                <div class="question-text">How confident are you in your ability to write effective AI prompts?</div>
+                <div class="slider-container">
+                    <input type="range" min="1" max="5" value="3" id="q1" class="slider">
+                    <div class="range-value" id="q1-value">3</div>
+                    <div class="scale-labels">
+                        <span>No idea</span>
+                        <span>Expert level</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-card">
+                <div class="question-number">Question 2 of 6</div>
+                <div class="question-text">How often do you trust AI outputs without heavy editing?</div>
+                <div class="slider-container">
+                    <input type="range" min="1" max="5" value="3" id="q2" class="slider">
+                    <div class="range-value" id="q2-value">3</div>
+                    <div class="scale-labels">
+                        <span>Never</span>
+                        <span>Always</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-card">
+                <div class="question-number">Question 3 of 6</div>
+                <div class="question-text">Does your team openly share AI workflows and learnings?</div>
+                <div class="slider-container">
+                    <input type="range" min="1" max="5" value="3" id="q3" class="slider">
+                    <div class="range-value" id="q3-value">3</div>
+                    <div class="scale-labels">
+                        <span>Not at all</span>
+                        <span>Daily</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-card">
+                <div class="question-number">Question 4 of 6</div>
+                <div class="question-text">Is AI built into your team's core marketing processes?</div>
+                <div class="slider-container">
+                    <input type="range" min="1" max="5" value="3" id="q4" class="slider">
+                    <div class="range-value" id="q4-value">3</div>
+                    <div class="scale-labels">
+                        <span>Not integrated</span>
+                        <span>Fully embedded</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-card">
+                <div class="question-number">Question 5 of 6</div>
+                <div class="question-text">Do you believe AI adoption is critical to your competitive advantage?</div>
+                <div class="slider-container">
+                    <input type="range" min="1" max="5" value="3" id="q5" class="slider">
+                    <div class="range-value" id="q5-value">3</div>
+                    <div class="scale-labels">
+                        <span>Not important</span>
+                        <span>Mission-critical</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-card">
+                <div class="question-number">Question 6 of 6</div>
+                <div class="question-text">How motivated do you feel to experiment with AI tools?</div>
+                <div class="slider-container">
+                    <input type="range" min="1" max="5" value="3" id="q6" class="slider">
+                    <div class="range-value" id="q6-value">3</div>
+                    <div class="scale-labels">
+                        <span>Resistant</span>
+                        <span>Excited</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" onclick="calculateResults()">See My Results</button>
+        </div>
+
+        <!-- Results Page -->
+        <div id="resultsPage" class="page">
+            <h1>Your AI Readiness Results</h1>
+            <p class="subtitle">Here's where you stand</p>
+
+            <div class="score-display">
+                <div class="score-number" id="totalScore">0</div>
+                <div class="score-label">Total Score</div>
+            </div>
+
+            <div class="maturity-level">
+                <div class="maturity-title" id="maturityLevel">Loading...</div>
+                <p id="maturityDescription"></p>
+            </div>
+
+            <div class="blocker-section">
+                <div class="blocker-title">Your Primary Blocker</div>
+                <div class="blocker-item" id="primaryBlocker">Calculating...</div>
+            </div>
+
+            <button class="btn" onclick="showEmailForm()">Get Your Personalized Action Plan</button>
+
+            <div class="email-form" id="emailForm">
+                <h3 style="color: #7C5CFF; margin-bottom: 20px;">Get Your Action Plan</h3>
+                <p style="margin-bottom: 25px; color: #999;">Enter your details to receive a personalized roadmap for AI excellence.</p>
+
+                <form onsubmit="submitForm(event)">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <button type="submit" class="btn">Send Me My Action Plan</button>
+                </form>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <h3>Thank You!</h3>
+                <p>Your personalized action plan is on its way to your inbox.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update slider values in real-time
+        const sliders = document.querySelectorAll('.slider');
+        sliders.forEach(slider => {
+            slider.addEventListener('input', function() {
+                const valueDisplay = document.getElementById(this.id + '-value');
+                valueDisplay.textContent = this.value;
+                updateProgress();
+            });
+        });
+
+        // Update progress bar
+        function updateProgress() {
+            const totalQuestions = 6;
+            let answered = 0;
+
+            sliders.forEach(slider => {
+                if (slider.value !== '3') {
+                    answered++;
+                }
+            });
+
+            const progress = (answered / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // Calculate results
+        function calculateResults() {
+            const scores = {
+                aiSkills: parseInt(document.getElementById('q1').value),
+                aiConfidence: parseInt(document.getElementById('q2').value),
+                teamCulture: parseInt(document.getElementById('q3').value),
+                workflowIntegration: parseInt(document.getElementById('q4').value),
+                strategicBelief: parseInt(document.getElementById('q5').value),
+                emotionalDrive: parseInt(document.getElementById('q6').value)
+            };
+
+            const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+
+            // Determine maturity level
+            let maturityLevel, maturityDescription;
+            if (totalScore <= 10) {
+                maturityLevel = 'Beginner';
+                maturityDescription = 'You\'re in the early stages of AI adoption. There\'s significant opportunity to build foundational skills and integrate AI into your workflow.';
+            } else if (totalScore <= 20) {
+                maturityLevel = 'Skilled';
+                maturityDescription = 'You have a solid foundation with AI tools and are actively using them. The next step is strategic integration and team-wide adoption.';
+            } else {
+                maturityLevel = 'Strategic';
+                maturityDescription = 'You\'re leading with AI. Your focus should be on optimization, innovation, and maintaining competitive advantage through AI excellence.';
+            }
+
+            // Find primary blocker (lowest scoring element)
+            const elements = {
+                'AI Skills': scores.aiSkills,
+                'AI Confidence': scores.aiConfidence,
+                'Team Culture': scores.teamCulture,
+                'Workflow Integration': scores.workflowIntegration,
+                'Strategic Belief': scores.strategicBelief,
+                'Emotional Drive': scores.emotionalDrive
+            };
+
+            let primaryBlocker = '';
+            let lowestScore = 5;
+
+            for (const [key, value] of Object.entries(elements)) {
+                if (value < lowestScore) {
+                    lowestScore = value;
+                    primaryBlocker = key;
+                }
+            }
+
+            // Display results
+            document.getElementById('totalScore').textContent = totalScore;
+            document.getElementById('maturityLevel').textContent = maturityLevel;
+            document.getElementById('maturityDescription').textContent = maturityDescription;
+            document.getElementById('primaryBlocker').textContent = primaryBlocker;
+
+            // Switch to results page
+            document.getElementById('questionsPage').classList.remove('active');
+            document.getElementById('resultsPage').classList.add('active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Show email form
+        function showEmailForm() {
+            const emailForm = document.getElementById('emailForm');
+            emailForm.classList.add('active');
+            emailForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Submit form
+        function submitForm(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            // Here you would typically send this data to your server
+            console.log('Form submitted:', { name, email });
+
+            // Show success message
+            document.getElementById('emailForm').style.display = 'none';
+            document.getElementById('successMessage').classList.add('active');
+
+            // You can add actual form submission logic here
+            // For example, using fetch() to send to your backend
+        }
+
+        // Initialize progress bar
+        updateProgress();
+    </script>
+</body>
+</html>
