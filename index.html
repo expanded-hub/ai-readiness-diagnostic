@@ -21,12 +21,33 @@
             line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Bottom radial purple glow for entire page */
+        body::after {
+            content: '';
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            width: 1200px;
+            max-width: 120%;
+            height: 40vh;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center bottom, rgba(124,92,255,0.30) 0%, rgba(124,92,255,0.14) 10%, transparent 60%);
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.9;
         }
 
         .header {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px 20px 10px 20px;
+            position: relative;
+            z-index: 2;
         }
 
         .header a {
@@ -45,13 +66,18 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 40px 20px;
+            position: relative;
+            z-index: 2;
         }
 
         h1 {
             font-size: 2.5rem;
-            margin-bottom: 1rem;
+            padding: 40px 0;
+            margin: 0 0 0 0;
             color: #7C5CFF;
             font-weight: 800;
+            text-shadow: 0 8px 30px rgba(124,92,255,0.12), 0 2px 8px rgba(124,92,255,0.06);
+            transition: text-shadow 0.3s ease;
         }
 
         .subtitle {
@@ -61,8 +87,18 @@
             line-height: 1.7;
         }
 
+        .trust-signal {
+            font-size: 14px;
+            color: #94A3B8;
+            font-style: italic;
+            margin-top: 12px;
+            margin-bottom: 24px;
+        }
+
         .page {
             display: none;
+            position: relative;
+            z-index: 1;
         }
 
         .page.active {
@@ -90,10 +126,11 @@
         }
 
         .question-number {
-            color: #7C5CFF;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 10px;
+            color: #A78BFA;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            opacity: 0.95;
         }
 
         .question-text {
@@ -135,6 +172,7 @@
             outline: none;
             -webkit-appearance: none;
             margin: 20px 0;
+            transition: background 0.3s ease, box-shadow 0.2s ease;
         }
 
         input[type="range"]::-webkit-slider-thumb {
@@ -151,6 +189,10 @@
         input[type="range"]::-webkit-slider-thumb:hover {
             transform: scale(1.2);
             box-shadow: 0 0 20px rgba(124, 92, 255, 0.6);
+        }
+
+        input[type="range"]:active::-webkit-slider-thumb {
+            transform: scale(1.22);
         }
 
         input[type="range"]::-moz-range-thumb {
@@ -174,6 +216,7 @@
             font-weight: 700;
             color: #7C5CFF;
             margin-top: 10px;
+            transition: color 0.18s ease, transform 0.12s ease;
         }
 
         .scale-labels {
@@ -210,6 +253,7 @@
 
         .results-container {
             text-align: center;
+            position: relative;
         }
 
         .score-display {
@@ -217,6 +261,8 @@
             border-radius: 20px;
             padding: 50px 30px;
             margin: 40px 0;
+            position: relative;
+            z-index: 2;
         }
 
         .score-number {
@@ -334,6 +380,31 @@
             padding: 40px;
         }
 
+        /* Gradient behind the results page */
+        #resultsPage {
+            position: relative;
+            z-index: 1;
+        }
+
+        #resultsPage::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -40px;
+            width: 1000px;
+            max-width: 120%;
+            height: 50%;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center bottom, rgba(124,92,255,0.30) 0%, rgba(124,92,255,0.10) 10%, transparent 60%);
+            filter: blur(60px);
+            z-index: 0;
+            opacity: 0.9;
+        }
+
+        /* Hide any horizontal divider lines */
+        hr { display: none; }
+
         .tally-heading {
             font-size: 1.8rem;
             color: #7C5CFF;
@@ -396,6 +467,7 @@
         <div id="questionsPage" class="page active">
             <h1>AI Readiness Scorecard</h1>
             <p class="subtitle">Get an instant diagnosis to understand what's blocking AI adoption in your team. This 6-question assessment is built on the COM-B model for Behaviour Change.</p>
+            <p class="trust-signal">Built on the COM-B Behaviour Change model from UCL</p>
 
             <div class="progress-bar">
                 <div class="progress-fill" id="progressBar"></div>
