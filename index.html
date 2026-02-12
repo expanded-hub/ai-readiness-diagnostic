@@ -63,25 +63,6 @@
             margin-bottom: 15px;
         }
 
-        .intro ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .intro ul li {
-            position: relative;
-            padding-left: 25px;
-            margin-bottom: 10px;
-        }
-
-        .intro ul li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #667eea;
-            font-weight: bold;
-        }
-
         .start-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -405,21 +386,15 @@
         <!-- Intro Section -->
         <div id="intro-section">
             <div class="header">
-                <h1>Why AI Tools Aren't Sticking in Your Marketing Team</h1>
+                <h1>Why Your AI Tools Aren't Sticking</h1>
                 <p class="subtitle">2-minute diagnostic reveals if your blocker is skills, workflow, or trust</p>
             </div>
             
             <div class="intro">
-                <p>Your team knows AI could save 10 hours a week. Some people have tried tools. But three months later, everyone's back to the old way.</p>
+                <p>Your team knows AI could save 10 hours a week. Some people have tried tools. But three months later, everyone's back to the old way. Meanwhile, your competitors are shipping work in half the time.</p>
                 <p>We've seen this in 100+ marketing teams. The blocker is predictable, but it's usually not what you think.</p>
-                <p>Answer 6 questions to discover your team's specific pattern and get the fix that worked for teams like yours.</p>
-                <p style="margin-top: 20px;"><strong>In 2 minutes you'll discover:</strong></p>
-                <ul style="text-align: left; margin: 15px auto; max-width: 500px; line-height: 1.8;">
-                    <li>Which of 8 common patterns matches your team</li>
-                    <li>Your #1 blocker (skills, workflow design, or motivation)</li>
-                    <li>One action you can take this week that actually moves the needle</li>
-                </ul>
-                <button class="start-button" onclick="startAudit()">Find My Team's Pattern</button>
+                <p>Six questions reveal which of 8 patterns is blocking your team - and the fix that worked for teams like yours.</p>
+                <button class="start-button" onclick="startAudit()">Diagnose My Blocker</button>
             </div>
         </div>
 
@@ -481,9 +456,10 @@
             <div class="email-gate">
                 <h3>Want Your Full Action Plan?</h3>
                 <p style="margin-bottom: 20px;">Your BRIDGE Roadmap includes:</p>
-                <ul id="roadmap-benefits" style="text-align: left; max-width: 600px; margin: 0 auto 25px; line-height: 1.8; list-style-position: inside;"></ul>
+                <ul id="roadmap-benefits" style="text-align: left; max-width: 600px; margin: 0 auto 20px; line-height: 1.8; list-style-position: inside;"></ul>
+                <p id="social-proof" style="font-size: 0.95em; opacity: 0.9; margin-bottom: 15px;"></p>
                 <p style="font-size: 0.95em; opacity: 0.9;">You'll receive it within 24 hours.</p>
-                <button class="start-button" onclick="openTallyForm()" style="margin-top: 15px;">Send My Roadmap</button>
+                <button class="start-button" onclick="openTallyForm()" style="margin-top: 15px;">Get My Action Plan</button>
             </div>
         </div>
     </div>
@@ -562,100 +538,100 @@
         // Persona definitions
         const personas = {
             'high-low-high': {
-                name: 'The Equipped Skeptic',
-                headline: "You're an Equipped Skeptic - And Here's Your Risk",
+                name: 'The Proof Seekers',
+                headline: "You're a Proof Seeker - And Here's Your Risk",
                 insight: "Your team has the skills and the systems, but they're not convinced AI is worth the investment yet. This isn't a capability problem. It's a proof problem. Without concrete evidence that AI delivers better results faster, your team will keep defaulting to methods they trust.\n\nThe danger: While you debate, competitors are building AI-native workflows that create compound advantages. Every month of skepticism widens that gap.",
-                scoresExplain: "Your team scores high on Capability (they know how to use AI) and Opportunity (you have tools and time). But Motivation is low. They don't see urgent value in changing how they work.",
+                scoresExplain: "Your team scores high on Capability (they know how to use AI) and Opportunity (you have tools and time). But Motivation is low. They don't see urgent value in changing how they work.\n\nThis is why your team tried tools but went back to the old way - they're waiting for proof that AI is better than their proven methods.",
                 action: "This week: Pick one task your team universally hates (report formatting, campaign setup, competitor research). Assign one person to solve it with AI and measure time saved. Share the before/after numbers at your next team meeting.\n\nWhy this works: Skeptics need proof, not promises. One visible win creates believers.",
                 roadmapBenefits: [
                     "The 3 highest-impact use cases for skeptical teams (based on fastest time-to-value)",
                     "How to run proof-of-concept pilots that create believers",
                     "The metrics that convince skeptics AI is worth adopting"
-                ]
+                ],
             },
             'high-high-low': {
-                name: 'The Motivated Blocker',
-                headline: "You're a Motivated Blocker - Your Team's Ready But Your Workflows Aren't",
+                name: 'The Ready But Stuck',
+                headline: "You're Ready But Stuck - Your Workflows Are the Problem",
                 insight: "Your team wants to adopt AI and knows how to use it. But your workflows, processes, and systems weren't built for AI integration. People try to add AI to existing processes and it feels like extra work, not efficiency.\n\nThis is the most fixable blocker, but only if you redesign workflows, not just add tools.",
-                scoresExplain: "High Capability and Motivation show your team is ready. Low Opportunity means your current workflows, approval chains, or processes make AI integration harder than manual work.",
+                scoresExplain: "High Capability and Motivation show your team is ready. Low Opportunity means your current workflows, approval chains, or processes make AI integration harder than manual work.\n\nThis is why your team tried tools but went back to the old way - AI felt like adding steps, not removing them.",
                 action: "This week: Map one core workflow end-to-end (content creation, campaign setup, lead scoring - pick one). Circle every step that requires waiting, manual copying, or repetitive formatting. Those are your AI integration points.\n\nWhy this works: You don't need better tools. You need workflows designed for AI from the start.",
                 roadmapBenefits: [
                     "How to redesign one workflow to be AI-native (not AI-added)",
                     "Where to remove approval bottlenecks that block AI adoption",
-                    "The 4-week implementation plan for Motivated Blockers"
-                ]
+                    "The 4-week implementation plan for Ready But Stuck teams"
+                ],
             },
             'low-high-high': {
-                name: 'The Eager Learner',
-                headline: "You're an Eager Learner - You're Ready to Commit, You Just Need the Skills",
+                name: 'The Hungry Learners',
+                headline: "You're Hungry Learners - Ready to Sprint",
                 insight: "Your team is motivated and has time to learn, but lacks confidence in their AI skills. This is the best position to be in. Capability gaps close faster than motivation or workflow gaps.\n\nThe risk: Without structured learning, eager teams waste time on random tutorials instead of building skills that matter for your specific use cases.",
-                scoresExplain: "High Motivation and Opportunity show you're ready to invest time. Low Capability means your team needs focused skill-building, not more experimentation.",
+                scoresExplain: "High Motivation and Opportunity show you're ready to invest time. Low Capability means your team needs focused skill-building, not more experimentation.\n\nThis is why your team tried tools but went back to the old way - they wanted to use AI but didn't know where to start or how to build confidence.",
                 action: "This week: Pick ONE AI tool that solves your team's biggest daily frustration. Assign 30 minutes/day for 5 days for everyone to practice on real work (not tutorials). Share results Friday.\n\nWhy this works: Eager learners need structure. Daily practice on real tasks builds capability faster than sporadic experimentation.",
                 roadmapBenefits: [
                     "Which AI skills to build first (based on your team's role and goals)",
                     "The 30-day practice plan that builds confidence",
                     "How to avoid tutorial paralysis and focus on applicable skills"
-                ]
+                ],
             },
             'medium-medium-low': {
                 name: 'The Solo Experimenter',
-                headline: "You're a Solo Experimenter - Individuals Are Winning But the Team Isn't Scaling",
+                headline: "You're Solo Experimenters - Wins Aren't Scaling",
                 insight: "Some people on your team are using AI successfully. But there's no process for sharing what works, so everyone's reinventing solutions independently. Individual wins aren't becoming team capabilities.\n\nWithout shared learning systems, you'll stay stuck at 20% adoption forever.",
-                scoresExplain: "Medium scores across the board show you have pockets of success but no systematic adoption. The blocker is knowledge sharing, not individual capability.",
+                scoresExplain: "Medium scores across the board show you have pockets of success but no systematic adoption. The blocker is knowledge sharing, not individual capability.\n\nThis is why your team tried tools but went back to the old way - the people who figured it out kept it to themselves, so everyone else gave up.",
                 action: "This week: Create a #ai-wins Slack channel (or email thread). Rule: Every time someone uses AI successfully, they share the tool + prompt + result. No commentary needed. Just visibility.\n\nWhy this works: Solo experimenters need to see each other's successes to build confidence and copy what works.",
                 roadmapBenefits: [
                     "How to turn individual wins into team playbooks",
                     "The knowledge-sharing system that scales adoption",
                     "How to identify your AI champions and leverage them effectively"
-                ]
+                ],
             },
             'high-low-medium': {
-                name: 'The Cautious Capable',
-                headline: "You're Cautiously Capable - You Can Use AI, But Trust and Urgency Are Holding You Back",
+                name: 'The Hesitant Experts',
+                headline: "You're Hesitant Experts - Trust Is Holding You Back",
                 insight: "Your team has the skills, but they don't trust AI output quality enough to commit to it. They're waiting for AI to get better before fully adopting, but that strategy has a hidden cost.\n\nEvery month of caution, your competitors build advantages that compound. The gap isn't closing. It's widening.",
-                scoresExplain: "High Capability shows your team knows how to use AI. Low Motivation means they're unconvinced it's worth changing their proven workflows. This is a trust problem, not a skills problem.",
+                scoresExplain: "High Capability shows your team knows how to use AI. Low Motivation means they're unconvinced it's worth changing their proven workflows. This is a trust problem, not a skills problem.\n\nThis is why your team tried tools but went back to the old way - they don't trust the output quality enough to stake their reputation on it.",
                 action: "This week: Document 3 competitors or peer companies using AI in your space (look at their job postings, product announcements, or social content). Make the threat visible to your team.\n\nWhy this works: Cautious teams need external pressure to overcome internal inertia. Competitive threat creates urgency.",
                 roadmapBenefits: [
                     "How to build trust through controlled AI experiments",
                     "The competitive intelligence that creates urgency",
                     "Quality control processes that make cautious teams confident"
-                ]
+                ],
             },
             'medium-medium-medium': {
-                name: 'The Balanced Builder',
-                headline: "You're a Balanced Builder - And Here's Your Risk",
-                insight: "Your team is progressing steadily across skills, workflow, and motivation. But without a clear owner and deadline, this momentum will stall in 6-8 weeks. You'll stay 'pretty good at AI' but never become AI-native.\n\nBalanced teams without structure become permanently stuck at 50% adoption.",
-                scoresExplain: "All three dimensions are medium, which means you're building capability but lack the structure to sustain it. You need accountability, not more resources.",
-                action: "This week: Pick your highest-impact workflow. Assign one person to own making it AI-native. Give them 3 hours/week for 4 weeks. Set a specific deadline to review results.\n\nWhy this works: Balanced teams need accountability to avoid diffusion of responsibility. Ownership converts progress into outcomes.",
+                name: 'The Stuck at Good',
+                headline: "You're Stuck at Good - And Here's Why That's Dangerous",
+                insight: "Your team is making progress across skills, workflow, and motivation. But without a clear owner and deadline, this momentum will stall in 6-8 weeks. You'll stay 'pretty good at AI' but never become AI-native.\n\nTeams stuck at good become permanently stuck at 50% adoption because 'good enough' becomes the new normal.",
+                scoresExplain: "All three dimensions are medium, which means you're building capability but lack the structure to sustain it. You need accountability, not more resources.\n\nThis is why your team tried tools but went back to the old way - everyone's doing a little AI work, but nobody owns making it stick.",
+                action: "This week: Pick your highest-impact workflow. Assign one person to own making it AI-native. Give them 3 hours/week for 4 weeks. Set a specific deadline to review results.\n\nWhy this works: Teams stuck at good need accountability to avoid diffusion of responsibility. Ownership converts progress into outcomes.",
                 roadmapBenefits: [
                     "Which workflow to make AI-native first (based on impact + feasibility)",
                     "The 4-week sprint structure that creates accountability",
-                    "How to avoid the momentum trap other Balanced Builders hit"
-                ]
+                    "How to avoid the momentum trap teams stuck at good always hit"
+                ],
             },
             'high-high-medium': {
-                name: 'The Emerging Native',
-                headline: "You're an Emerging Native - You're 80% There, Here's the Final 20%",
-                insight: "Your team has skills and motivation. You're close to AI-native. But some workflows still aren't fully integrated, which creates friction that slows everything down. The final step is ruthlessly eliminating manual handoffs.\n\nTeams at this stage often plateau because 'mostly AI-native' feels good enough. Don't stop here.",
-                scoresExplain: "High Capability and Motivation show you're ready. Medium Opportunity means you have pockets of manual work still creating bottlenecks. The last 20% delivers disproportionate value.",
+                name: 'The Nearly Native',
+                headline: "You're Nearly Native - Don't Stop at 80%",
+                insight: "Your team has skills and motivation. You're close to AI-native. But some workflows still aren't fully integrated, which creates friction that slows everything down. The final step is ruthlessly eliminating manual handoffs.\n\nTeams at this stage often plateau because 'mostly AI-native' feels good enough. Don't stop here. The last 20% delivers disproportionate value.",
+                scoresExplain: "High Capability and Motivation show you're ready. Medium Opportunity means you have pockets of manual work still creating bottlenecks. The last 20% delivers disproportionate value.\n\nThis is why even your team occasionally reverts to old methods - those final manual handoffs still exist and become tempting shortcuts under pressure.",
                 action: "This week: Audit your top 5 workflows. Find every point where someone copies data manually, waits for approval, or reformats AI output. Pick the biggest bottleneck and eliminate it.\n\nWhy this works: The final integration gaps create disproportionate friction. Removing them unlocks full AI-native velocity.",
                 roadmapBenefits: [
                     "How to identify your remaining manual bottlenecks",
                     "The integration strategy that gets you to 100% AI-native",
                     "How to sustain AI-native operations long-term"
-                ]
+                ],
             },
             'low-low-high': {
-                name: 'The Reluctant Starter',
-                headline: "You're a Reluctant Starter - You Have Time, But Need Skills and Belief to Begin",
+                name: 'The Slow Burn',
+                headline: "You're on Slow Burn - Here's How to Ignite",
                 insight: "Your team has the space to learn (time, resources, support) but lacks both skills and conviction that AI is worth the effort. This combination means AI adoption feels like a distraction from 'real work.'\n\nThe fix: Start small with a tool that solves a universally hated task. One visible win builds both capability and motivation.",
-                scoresExplain: "High Opportunity shows you have resources. Low Capability and Motivation mean your team needs proof AI is worth learning. This is a quick-win problem, not a resources problem.",
-                action: "This week: Pick the task your team complains about most (formatting reports, scheduling posts, data entry). Find one AI tool that handles 80% of it. Have one person test it and share results.\n\nWhy this works: Reluctant starters need to see AI remove pain before they'll invest time learning it. Start with relief, not ambition.",
+                scoresExplain: "High Opportunity shows you have resources. Low Capability and Motivation mean your team needs proof AI is worth learning. This is a quick-win problem, not a resources problem.\n\nThis is why your team tried tools but went back to the old way - AI felt like extra work with no visible payoff.",
+                action: "This week: Pick the task your team complains about most (formatting reports, scheduling posts, data entry). Find one AI tool that handles 80% of it. Have one person test it and share results.\n\nWhy this works: Slow Burn teams need to see AI remove pain before they'll invest time learning it. Start with relief, not ambition.",
                 roadmapBenefits: [
                     "The highest-ROI first use case for reluctant teams",
                     "How to build confidence through small, visible wins",
                     "The learning path that converts reluctance into momentum"
-                ]
+                ],
             }
         };
 
@@ -780,6 +756,8 @@
             benefitsList.innerHTML = persona.roadmapBenefits.map(benefit => 
                 `<li>${benefit}</li>`
             ).join('');
+            
+            // Update social proof
 
             // Update COM-B bars
             updateBar('capability', scores.capability, c);
