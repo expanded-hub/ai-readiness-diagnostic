@@ -433,10 +433,7 @@
             <div class="email-gate">
                 <h3>Get Your Personalized BRIDGE Roadmap</h3>
                 <p>Receive a customized action plan to close your gap and move your team to AI-Native.</p>
-                <form class="email-form" onsubmit="submitEmail(event)">
-                    <input type="email" class="email-input" placeholder="Enter your email" required id="email-input">
-                    <button type="submit" class="email-submit">Get My Roadmap</button>
-                </form>
+                <button class="start-button" onclick="openTallyForm()" style="margin-top: 0;">Get My Roadmap</button>
             </div>
         </div>
     </div>
@@ -688,19 +685,18 @@
             }, 300);
         }
 
-        function submitEmail(event) {
-            event.preventDefault();
-            const email = document.getElementById('email-input').value;
+        function openTallyForm() {
+            const scores = calculateScores();
+            const c = classifyScore(scores.capability);
+            const o = classifyScore(scores.opportunity);
+            const m = classifyScore(scores.motivation);
+            const persona = getPersona(c, o, m);
             
-            // Log to console (you'll replace this with your email service integration)
-            console.log('Email submitted:', email);
-            console.log('Scores:', calculateScores());
+            // Construct Tally URL with hidden fields
+            const tallyURL = `https://tally.so/r/ob2QMO?persona=${encodeURIComponent(persona.name)}&capability_score=${scores.capability}&opportunity_score=${scores.opportunity}&motivation_score=${scores.motivation}`;
             
-            // Show confirmation
-            alert('Thank you! Your personalized BRIDGE roadmap will be sent to ' + email + ' within 24 hours.');
-            
-            // Here you would integrate with your email service (Mailchimp, ConvertKit, etc.)
-            // Example: fetch('your-api-endpoint', { method: 'POST', body: JSON.stringify({ email, scores }) })
+            // Open Tally form in same tab
+            window.location.href = tallyURL;
         }
     </script>
 </body>
