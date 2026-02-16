@@ -454,12 +454,17 @@
             </div>
 
             <div class="email-gate">
-                <h3>Want Your Full Action Plan?</h3>
-                <p style="margin-bottom: 20px;">Your BRIDGE Roadmap includes:</p>
-                <ul id="roadmap-benefits" style="text-align: left; max-width: 600px; margin: 0 auto 20px; line-height: 1.8; list-style-position: inside;"></ul>
-                <p id="social-proof" style="font-size: 0.95em; opacity: 0.9; margin-bottom: 15px;"></p>
-                <p style="font-size: 0.95em; opacity: 0.9;">You'll receive it within 24 hours.</p>
-                <button class="start-button" onclick="openTallyForm()" style="margin-top: 15px;">Get My Action Plan</button>
+                <h3>Get Your AI Adoption Roadmap (In 1 Session)</h3>
+                <p style="margin-bottom: 20px;">Stop guessing. In one session, we will build:</p>
+                <ol style="text-align: left; max-width: 650px; margin: 0 auto 25px; line-height: 1.8; padding-left: 20px;">
+                    <li style="margin-bottom: 12px;"><strong>Your "AI Native" Scorecard:</strong> A proprietary diagnostic across the 6 dimensions of adoption. You'll finally know why the tools aren't sticking.</li>
+                    <li style="margin-bottom: 12px;"><strong>The "Unblocker" Strategy:</strong> We'll isolate the 3 specific behavioural levers you need to pull to get your team actually using the tech you bought.</li>
+                    <li style="margin-bottom: 12px;"><strong>The ROI Calculator:</strong> We'll map your current workflows to identify exactly which metrics will move (and by how much) once AI is installed correctly.</li>
+                    <li style="margin-bottom: 12px;"><strong>The "Cost of Inaction" Report:</strong> A candid assessment of the risks accumulating in your team right now (from burnout to shadow AI) if this isn't fixed.</li>
+                    <li style="margin-bottom: 12px;"><strong>Your 30-Day Execution Sprint:</strong> A week-by-week plan to install these habits. No fluff. Just the actions.</li>
+                </ol>
+                <p style="font-size: 0.95em; opacity: 0.95; margin-bottom: 25px;"><strong>The "Anti-Pitch" Promise:</strong> This is not a sales call in disguise. It is a diagnostic session. You will receive the Roadmap PDF whether we work together or not.</p>
+                <button class="start-button" onclick="bookSession()" style="margin-top: 15px;">Book My Roadmap Session</button>
             </div>
         </div>
     </div>
@@ -750,14 +755,6 @@
             document.getElementById('persona-insight').textContent = persona.insight;
             document.getElementById('scores-explanation').textContent = persona.scoresExplain;
             document.getElementById('quick-action-text').textContent = persona.action;
-            
-            // Update roadmap benefits
-            const benefitsList = document.getElementById('roadmap-benefits');
-            benefitsList.innerHTML = persona.roadmapBenefits.map(benefit => 
-                `<li>${benefit}</li>`
-            ).join('');
-            
-            // Update social proof
 
             // Update COM-B bars
             updateBar('capability', scores.capability, c);
@@ -776,18 +773,9 @@
             }, 300);
         }
 
-        function openTallyForm() {
-            const scores = calculateScores();
-            const c = classifyScore(scores.capability);
-            const o = classifyScore(scores.opportunity);
-            const m = classifyScore(scores.motivation);
-            const persona = getPersona(c, o, m);
-            
-            // Construct Tally URL with hidden fields
-            const tallyURL = `https://tally.so/r/ob2QMO?persona=${encodeURIComponent(persona.name)}&capability_score=${scores.capability}&opportunity_score=${scores.opportunity}&motivation_score=${scores.motivation}`;
-            
-            // Open Tally form in same tab
-            window.location.href = tallyURL;
+        function bookSession() {
+            // Open calendar booking in same tab
+            window.location.href = 'https://calendar.app.google/5j3iBjmE8jN9wqXJ7';
         }
     </script>
 </body>
