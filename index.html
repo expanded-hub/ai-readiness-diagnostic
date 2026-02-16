@@ -454,6 +454,55 @@
                 <p id="quick-action-text" style="white-space: pre-line;"></p>
             </div>
 
+            <div style="background: #f7fafc; padding: 30px; border-radius: 12px; margin-bottom: 30px;">
+                <h3 style="font-size: 1.2em; color: #2d3748; margin-bottom: 20px; text-align: center;">Help Us Personalize Your Report</h3>
+                <p style="text-align: center; color: #4a5568; margin-bottom: 25px;">Answer 4 quick questions to unlock deeper insights in your READINESS Report.</p>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #2d3748;">Which AI tools has your team already tried?</label>
+                    <select id="tools-tried" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em;">
+                        <option value="">Select one...</option>
+                        <option value="none">None yet, we're just starting</option>
+                        <option value="basic">ChatGPT / Claude</option>
+                        <option value="marketing">Marketing-specific tools (Jasper, Copy.ai, etc.)</option>
+                        <option value="multiple">Multiple tools across different functions</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #2d3748;">What happened when you tried them?</label>
+                    <select id="what-happened" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em;">
+                        <option value="">Select one...</option>
+                        <option value="dropped-off">Worked great initially, then usage dropped off</option>
+                        <option value="champions-only">A few champions use them, most don't</option>
+                        <option value="didnt-stick">Tried once or twice, didn't stick</option>
+                        <option value="still-experimenting">Still experimenting, no patterns yet</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #2d3748;">How long have you been trying to get AI adopted?</label>
+                    <select id="time-trying" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em;">
+                        <option value="">Select one...</option>
+                        <option value="0-3">Just starting (0-3 months)</option>
+                        <option value="3-6">Early days (3-6 months)</option>
+                        <option value="6-12">Stuck for a while (6-12 months)</option>
+                        <option value="12+">Over a year</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #2d3748;">What would success look like 3 months from now?</label>
+                    <select id="success-looks-like" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em;">
+                        <option value="">Select one...</option>
+                        <option value="one-workflow">One core workflow fully automated</option>
+                        <option value="daily-use">Team using AI tools daily without prompting</option>
+                        <option value="measurable-savings">Measurable time savings we can prove</option>
+                        <option value="cultural-shift">Cultural shift - AI becomes the default approach</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="email-gate">
                 <h3>Get Your AI Adoption Roadmap (In One Session)</h3>
                 <p style="margin-bottom: 20px;">Stop guessing. In one session, we'll build:</p>
@@ -775,6 +824,17 @@
         }
 
         function startDownloadFlow() {
+            // Validate follow-up questions are answered
+            const toolsTried = document.getElementById('tools-tried').value;
+            const whatHappened = document.getElementById('what-happened').value;
+            const timeTrying = document.getElementById('time-trying').value;
+            const successLooksLike = document.getElementById('success-looks-like').value;
+            
+            if (!toolsTried || !whatHappened || !timeTrying || !successLooksLike) {
+                alert('Please answer all 4 questions to download your personalized report.');
+                return;
+            }
+            
             const scores = calculateScores();
             const c = classifyScore(scores.capability);
             const o = classifyScore(scores.opportunity);
@@ -786,6 +846,12 @@
                 persona: persona,
                 scores: scores,
                 classifications: { c, o, m },
+                followUp: {
+                    toolsTried: toolsTried,
+                    whatHappened: whatHappened,
+                    timeTrying: timeTrying,
+                    successLooksLike: successLooksLike
+                },
                 timestamp: new Date().toISOString()
             };
             localStorage.setItem('aiReadinessDiagnostic', JSON.stringify(diagnosticData));
@@ -794,6 +860,118 @@
             const tallyURL = `https://tally.so/r/ob2QMO?persona=${encodeURIComponent(persona.name)}&capability_score=${scores.capability}&opportunity_score=${scores.opportunity}&motivation_score=${scores.motivation}`;
             
             window.location.href = tallyURL;
+        }
+
+        function generateJourneyNarrative(followUp, persona, scores, classifications) {
+            const { toolsTried, whatHappened, timeTrying, successLooksLike } = followUp;
+            
+            // Map values to readable text
+            const toolsMap = {
+                'none': 'no AI tools yet',
+                'basic': 'ChatGPT and Claude',
+                'marketing': 'marketing-specific tools like Jasper or Copy.ai',
+                'multiple': 'multiple tools across different functions'
+            };
+            
+            const happenedMap = {
+                'dropped-off': 'usage dropped off after initial excitement',
+                'champions-only': 'only a few champions use them consistently',
+                'didnt-stick': 'the tools didn\'t stick beyond a trial or two',
+                'still-experimenting': 'you\'re still in experimental mode with no clear patterns'
+            };
+            
+            const timeMap = {
+                '0-3': '0-3 months',
+                '3-6': '3-6 months',
+                '6-12': '6-12 months',
+                '12+': 'over a year'
+            };
+            
+            const successMap = {
+                'one-workflow': 'one core workflow fully automated',
+                'daily-use': 'your team using AI tools daily without prompting',
+                'measurable-savings': 'measurable time savings you can prove to leadership',
+                'cultural-shift': 'a cultural shift where AI becomes the default approach'
+            };
+            
+            const tools = toolsMap[toolsTried] || toolsTried;
+            const happened = happenedMap[whatHappened] || whatHappened;
+            const time = timeMap[timeTrying] || timeTrying;
+            const success = successMap[successLooksLike] || successLooksLike;
+            
+            // Generate narrative based on their pattern
+            let narrative = `You've been at this for ${time}. `;
+            
+            if (toolsTried !== 'none') {
+                narrative += `Your team tried ${tools} and ${happened}.\n\n`;
+            } else {
+                narrative += `You haven't started using tools yet, but you're planning your approach.\n\n`;
+            }
+            
+            narrative += `This pattern is diagnostic. As a ${persona.name} team, you're hitting the exact trap most teams at your stage face: `;
+            
+            // Pattern-specific insights
+            if (persona.name === 'The Stuck at Good') {
+                narrative += `initial wins created pockets of adoption, but without a clear owner and accountability structure, momentum faded after 6-8 weeks.`;
+            } else if (persona.name === 'The Proof Seekers') {
+                narrative += `your team is waiting for proof that AI delivers better results, but without running proper experiments, you'll never get the evidence you need.`;
+            } else if (persona.name === 'The Ready But Stuck') {
+                narrative += `your team wants to use AI and knows how, but your current workflows weren't designed for AI integration, making it feel like extra work.`;
+            } else if (persona.name === 'The Hungry Learners') {
+                narrative += `you're motivated and have time, but without structured skill-building, you're wasting energy on random tutorials instead of applicable practice.`;
+            } else if (persona.name === 'The Solo Experimenter') {
+                narrative += `individuals are finding wins, but there's no system for sharing what works, so everyone's reinventing solutions independently.`;
+            } else if (persona.name === 'The Hesitant Experts') {
+                narrative += `your team has the skills but doesn't trust AI output quality enough to stake their reputation on it, so they default to proven methods.`;
+            } else if (persona.name === 'The Nearly Native') {
+                narrative += `you're close to AI-native but still have manual handoffs in your workflows, and those gaps create friction that slows everything down.`;
+            } else if (persona.name === 'The Slow Burn') {
+                narrative += `AI feels like a distraction from "real work" because you haven't seen it remove enough pain to justify the learning investment.`;
+            }
+            
+            narrative += `\n\nHere's what's different about your situation:\n`;
+            
+            // Time-based insight
+            if (timeTrying === '12+') {
+                narrative += `• You've been at this longer than most teams, which means you're likely stuck in a deeper pattern that needs behavioral intervention, not more tools.\n`;
+            } else if (timeTrying === '6-12') {
+                narrative += `• Six months is the inflection point where teams either systematize adoption or stay stuck at current levels indefinitely.\n`;
+            } else if (timeTrying === '3-6') {
+                narrative += `• You're past the honeymoon phase but haven't hit the frustration wall yet - this is the best time to build structure.\n`;
+            } else {
+                narrative += `• You're early enough to avoid the common traps other teams fall into, but only if you build the right foundations now.\n`;
+            }
+            
+            // Success definition insight
+            narrative += `• Success for you means ${success}, which requires `;
+            
+            const lowestDimension = scores.capability <= scores.opportunity && scores.capability <= scores.motivation ? 'Capability' :
+                                   scores.opportunity <= scores.motivation ? 'Opportunity' : 'Motivation';
+            
+            if (lowestDimension === 'Capability') {
+                narrative += `focused skill-building, not more experimentation.\n`;
+            } else if (lowestDimension === 'Opportunity') {
+                narrative += `workflow redesign, not better tools.\n`;
+            } else {
+                narrative += `proof and urgency, not more capabilities.\n`;
+            }
+            
+            // Tool-specific insight
+            if (whatHappened === 'dropped-off') {
+                narrative += `• The drop-off pattern tells you this is a workflow integration problem - tools work when used individually but haven't become part of team processes.\n`;
+            } else if (whatHappened === 'champions-only') {
+                narrative += `• Champion-only adoption means you have a knowledge sharing problem - wins aren't scaling beyond the people who figured it out first.\n`;
+            }
+            
+            narrative += `\nThe next 90 days: If you don't address your ${lowestDimension} gap now, you'll `;
+            
+            if (timeTrying === '12+') {
+                narrative += `spend another year cycling through tools without changing the underlying ${lowestDimension === 'Capability' ? 'skills gap' : lowestDimension === 'Opportunity' ? 'workflow design' : 'motivation issue'}.`;
+            } else {
+                narrative += `end up where teams at the 12+ month mark are: frustrated, skeptical, and stuck at ${whatHappened === 'champions-only' ? '20%' : '50%'} adoption with no clear path forward.`;
+            }
+            
+            return narrative;
         }
 
         function generatePDF(name, company) {
@@ -914,7 +1092,32 @@
             doc.setFont(undefined, 'bold');
             doc.text(`PRIMARY BLOCKER: ${lowestDimension}`, 15, yPos);
             
-            // PAGE 2: ACTION PLAN
+            // PAGE 2: YOUR ADOPTION JOURNEY
+            doc.addPage();
+            
+            // Header bar
+            doc.setFillColor(...purple);
+            doc.rect(0, 0, 210, 15, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('YOUR ADOPTION JOURNEY', 105, 9, { align: 'center' });
+            
+            // Reset
+            doc.setTextColor(...darkGray);
+            doc.setDrawColor(200, 200, 200);
+            doc.line(15, 20, 195, 20);
+            
+            // Generate and display journey narrative
+            const journeyNarrative = generateJourneyNarrative(data.followUp, persona, scores, { c, o, m });
+            
+            yPos = 28;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            const journeyLines = doc.splitTextToSize(journeyNarrative, 180);
+            doc.text(journeyLines, 15, yPos);
+            
+            // PAGE 3: ACTION PLAN
             doc.addPage();
             
             // Header bar
