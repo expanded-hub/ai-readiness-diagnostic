@@ -862,22 +862,42 @@
             window.location.href = tallyURL;
         }
 
-        function generateJourneyNarrative(followUp, persona, scores, classifications) {
-            const { toolsTried, whatHappened, timeTrying, successLooksLike } = followUp;
+        function generatePDF(name, company) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
             
-            // Map values to readable text
+            // Retrieve saved diagnostic data
+            const data = JSON.parse(localStorage.getItem('aiReadinessDiagnostic'));
+            if (!data) {
+                alert('Diagnostic data not found. Please retake the assessment.');
+                return;
+            }
+            
+            const persona = data.persona;
+            const scores = data.scores;
+            const { c, o, m } = data.classifications;
+            const followUp = data.followUp;
+            const date = new Date().toLocaleDateString('en-GB');
+            
+            // Colors
+            const purple = [102, 126, 234];
+            const darkGray = [45, 55, 72];
+            const mediumGray = [74, 85, 104];
+            const lightGray = [226, 232, 240];
+            const red = [245, 101, 101];
+            const orange = [237, 137, 54];
+            const green = [72, 187, 120];
+            
+            // Determine lowest dimension
+            const lowestDimension = scores.capability <= scores.opportunity && scores.capability <= scores.motivation ? 'Capability' :
+                                   scores.opportunity <= scores.motivation ? 'Opportunity' : 'Motivation';
+            
+            // Map follow-up values
             const toolsMap = {
                 'none': 'no AI tools yet',
                 'basic': 'ChatGPT and Claude',
-                'marketing': 'marketing-specific tools like Jasper or Copy.ai',
-                'multiple': 'multiple tools across different functions'
-            };
-            
-            const happenedMap = {
-                'dropped-off': 'usage dropped off after initial excitement',
-                'champions-only': 'only a few champions use them consistently',
-                'didnt-stick': 'the tools didn\'t stick beyond a trial or two',
-                'still-experimenting': 'you\'re still in experimental mode with no clear patterns'
+                'marketing': 'marketing-specific tools',
+                'multiple': 'multiple tools'
             };
             
             const timeMap = {
@@ -888,93 +908,319 @@
             };
             
             const successMap = {
-                'one-workflow': 'one core workflow fully automated',
-                'daily-use': 'your team using AI tools daily without prompting',
-                'measurable-savings': 'measurable time savings you can prove to leadership',
-                'cultural-shift': 'a cultural shift where AI becomes the default approach'
+                'one-workflow': 'One core workflow fully automated',
+                'daily-use': 'Team using AI daily without prompting',
+                'measurable-savings': 'Measurable time savings you can prove',
+                'cultural-shift': 'AI becomes the default approach'
             };
             
-            const tools = toolsMap[toolsTried] || toolsTried;
-            const happened = happenedMap[whatHappened] || whatHappened;
-            const time = timeMap[timeTrying] || timeTrying;
-            const success = successMap[successLooksLike] || successLooksLike;
+            // ===== PAGE 1: YOUR DIAGNOSIS =====
             
-            // Generate narrative based on their pattern
-            let narrative = `You've been at this for ${time}. `;
+            // Header bar
+            doc.setFillColor(...purple);
+            doc.rect(0, 0, 210, 15, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('YOUR AI READINESS DIAGNOSIS', 105, 9, { align: 'center' });
             
-            if (toolsTried !== 'none') {
-                narrative += `Your team tried ${tools} and ${happened}.\n\n`;
-            } else {
-                narrative += `You haven't started using tools yet, but you're planning your approach.\n\n`;
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            doc.text(`${name}, ${company} | ${date}`, 105, 13, { align: 'center' });
+            
+            // Persona box
+            doc.setFillColor(247, 250, 252);
+            doc.rect(15, 20, 180, 18, 'F');
+            doc.setTextColor(...darkGray);
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text(persona.name.toUpperCase(), 105, 28, { align: 'center' });
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'normal');
+            doc.text(persona.headline, 105, 34, { align: 'center' });
+            
+            // COM-B Profile section
+            let yPos = 45;
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(...darkGray);
+            doc.text('YOUR READINESS PROFILE', 15, yPos);
+            
+            yPos = yPos + 7;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            
+            const drawBar = (label, score, classification, y) => {
+                doc.text(label, 15, y);
+                doc.setFillColor(...lightGray);
+                doc.rect(70, y - 4, 80, 6, 'F');
+                
+                const fillWidth = (score / 8) * 80;
+                const barColor = classification === 'high' ? green : 
+                                classification === 'medium' ? orange : red;
+                doc.setFillColor(...barColor);
+                doc.rect(70, y - 4, fillWidth, 6, 'F');
+                
+                doc.text(`${score}/8`, 155, y);
+                doc.setFont(undefined, 'bold');
+                doc.text(classification.toUpperCase(), 170, y);
+                doc.setFont(undefined, 'normal');
+            };
+            
+            drawBar('Capability', scores.capability, c, yPos);
+            drawBar('Opportunity', scores.opportunity, o, yPos + 10);
+            drawBar('Motivation', scores.motivation, m, yPos + 20);
+            
+            // Primary Blocker highlight
+            yPos = yPos + 32;
+            doc.setFillColor(255, 245, 245);
+            doc.rect(15, yPos - 5, 180, 10, 'F');
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(...red);
+            doc.text(`→ PRIMARY BLOCKER: ${lowestDimension}`, 18, yPos + 1);
+            
+            // Why You're Stuck section
+            yPos = yPos + 12;
+            doc.setTextColor(...darkGray);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('WHY YOU\'RE STUCK', 15, yPos);
+            
+            yPos = yPos + 6;
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            
+            // Build combined narrative
+            let narrative = `You've been trying AI adoption for ${timeMap[followUp.timeTrying] || followUp.timeTrying}. `;
+            
+            if (followUp.toolsTried !== 'none') {
+                narrative += `Your team tried ${toolsMap[followUp.toolsTried]} but `;
+                
+                if (followUp.whatHappened === 'dropped-off') {
+                    narrative += 'usage dropped off after initial excitement. ';
+                } else if (followUp.whatHappened === 'champions-only') {
+                    narrative += 'only a few champions use them consistently. ';
+                } else if (followUp.whatHappened === 'didnt-stick') {
+                    narrative += 'the tools didn\'t stick beyond trials. ';
+                } else {
+                    narrative += 'you\'re still experimenting with no clear patterns. ';
+                }
             }
             
-            narrative += `This pattern is diagnostic. As a ${persona.name} team, you're hitting the exact trap most teams at your stage face: `;
+            narrative += `\n\nAs a ${persona.name} team, you're hitting a predictable trap: `;
             
-            // Pattern-specific insights
-            if (persona.name === 'The Stuck at Good') {
-                narrative += `initial wins created pockets of adoption, but without a clear owner and accountability structure, momentum faded after 6-8 weeks.`;
-            } else if (persona.name === 'The Proof Seekers') {
-                narrative += `your team is waiting for proof that AI delivers better results, but without running proper experiments, you'll never get the evidence you need.`;
-            } else if (persona.name === 'The Ready But Stuck') {
-                narrative += `your team wants to use AI and knows how, but your current workflows weren't designed for AI integration, making it feel like extra work.`;
-            } else if (persona.name === 'The Hungry Learners') {
-                narrative += `you're motivated and have time, but without structured skill-building, you're wasting energy on random tutorials instead of applicable practice.`;
-            } else if (persona.name === 'The Solo Experimenter') {
-                narrative += `individuals are finding wins, but there's no system for sharing what works, so everyone's reinventing solutions independently.`;
-            } else if (persona.name === 'The Hesitant Experts') {
-                narrative += `your team has the skills but doesn't trust AI output quality enough to stake their reputation on it, so they default to proven methods.`;
-            } else if (persona.name === 'The Nearly Native') {
-                narrative += `you're close to AI-native but still have manual handoffs in your workflows, and those gaps create friction that slows everything down.`;
-            } else if (persona.name === 'The Slow Burn') {
-                narrative += `AI feels like a distraction from "real work" because you haven't seen it remove enough pain to justify the learning investment.`;
+            // Add persona-specific trap
+            const trapMap = {
+                'The Stuck at Good': 'progress without accountability means momentum fades after 6-8 weeks',
+                'The Proof Seekers': 'waiting for proof without running proper experiments creates analysis paralysis',
+                'The Ready But Stuck': 'workflows designed for manual work make AI feel like extra steps',
+                'The Hungry Learners': 'enthusiasm without structured learning wastes time on random tutorials',
+                'The Solo Experimenter': 'individual wins without knowledge sharing keeps adoption at 20%',
+                'The Hesitant Experts': 'perfectionism prevents commitment - waiting for AI to get "good enough"',
+                'The Nearly Native': 'remaining manual handoffs create friction that slows everything',
+                'The Slow Burn': 'AI feels like distraction because pain removal hasn\'t been demonstrated'
+            };
+            
+            narrative += trapMap[persona.name] || 'without structure, progress becomes permanent stagnation';
+            narrative += '.\n\n';
+            
+            // Add insight based on their time trying
+            if (followUp.timeTrying === '12+') {
+                narrative += 'After a year, this pattern is entrenched. You need behavioral intervention, not more tools. ';
+            } else if (followUp.timeTrying === '6-12') {
+                narrative += 'Six months is the inflection point - teams either systematize now or stay stuck indefinitely. ';
+            } else if (followUp.timeTrying === '3-6') {
+                narrative += 'You\'re past honeymoon phase but haven\'t hit frustration yet - perfect time to build structure. ';
             }
             
-            narrative += `\n\nHere's what's different about your situation:\n`;
+            narrative += `Success for you = ${successMap[followUp.successLooksLike] || followUp.successLooksLike}.`;
             
-            // Time-based insight
-            if (timeTrying === '12+') {
-                narrative += `• You've been at this longer than most teams, which means you're likely stuck in a deeper pattern that needs behavioral intervention, not more tools.\n`;
-            } else if (timeTrying === '6-12') {
-                narrative += `• Six months is the inflection point where teams either systematize adoption or stay stuck at current levels indefinitely.\n`;
-            } else if (timeTrying === '3-6') {
-                narrative += `• You're past the honeymoon phase but haven't hit the frustration wall yet - this is the best time to build structure.\n`;
-            } else {
-                narrative += `• You're early enough to avoid the common traps other teams fall into, but only if you build the right foundations now.\n`;
-            }
+            const narrativeLines = doc.splitTextToSize(narrative, 180);
+            doc.text(narrativeLines, 15, yPos);
             
-            // Success definition insight
-            narrative += `• Success for you means ${success}, which requires `;
+            // 90-Day Warning box
+            yPos = yPos + (narrativeLines.length * 5) + 8;
+            doc.setFillColor(255, 237, 213);
+            doc.setDrawColor(237, 137, 54);
+            doc.setLineWidth(0.5);
+            doc.rect(15, yPos - 4, 180, 20, 'FD');
             
-            const lowestDimension = scores.capability <= scores.opportunity && scores.capability <= scores.motivation ? 'Capability' :
-                                   scores.opportunity <= scores.motivation ? 'Opportunity' : 'Motivation';
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(221, 107, 32);
+            doc.text('⚠ THE 90-DAY WARNING', 18, yPos + 2);
             
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(...darkGray);
+            doc.setFontSize(9);
+            const warningText = `If you don't fix your ${lowestDimension} gap now, you'll ${followUp.timeTrying === '12+' ? 'spend another year' : 'end up at 12+ months'} cycling through tools without changing the underlying ${lowestDimension === 'Capability' ? 'skills gap' : lowestDimension === 'Opportunity' ? 'workflow design' : 'motivation issue'}. ${followUp.whatHappened === 'champions-only' ? 'Adoption stays at 20%.' : 'Adoption plateaus at 50%.'}`;
+            const warningLines = doc.splitTextToSize(warningText, 175);
+            doc.text(warningLines, 18, yPos + 8);
+            
+            // ===== PAGE 2: YOUR ROADMAP =====
+            doc.addPage();
+            
+            // Header
+            doc.setFillColor(...purple);
+            doc.rect(0, 0, 210, 15, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('YOUR ROADMAP TO AI-NATIVE', 105, 9, { align: 'center' });
+            
+            // Success Goal box
+            yPos = 22;
+            doc.setTextColor(...darkGray);
+            doc.setFillColor(240, 253, 244);
+            doc.rect(15, yPos, 180, 15, 'F');
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text('YOUR SUCCESS GOAL (90 DAYS)', 18, yPos + 5);
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            doc.text(successMap[followUp.successLooksLike] || followUp.successLooksLike, 18, yPos + 11);
+            
+            // The 3 Behavioral Levers
+            yPos = yPos + 20;
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('THE 3 LEVERS YOU NEED TO PULL', 15, yPos);
+            
+            yPos = yPos + 6;
+            doc.setFontSize(10);
+            
+            // Generate levers based on blocker
+            const levers = [];
             if (lowestDimension === 'Capability') {
-                narrative += `focused skill-building, not more experimentation.\n`;
+                levers.push(
+                    '1. STRUCTURED PRACTICE: 30 min/day on real tasks (not tutorials) for 2 weeks',
+                    '2. SKILL PAIRING: Match confident users with learners for shadowing sessions',
+                    '3. USE CASE FOCUS: Pick 3 workflows, master those before expanding'
+                );
             } else if (lowestDimension === 'Opportunity') {
-                narrative += `workflow redesign, not better tools.\n`;
+                levers.push(
+                    '1. WORKFLOW REDESIGN: Map one end-to-end process, remove manual handoffs',
+                    '2. PROTECTED TIME: Block 3 hours/week per person for AI integration work',
+                    '3. APPROVAL CHAINS: Remove bottlenecks that make AI feel like extra steps'
+                );
             } else {
-                narrative += `proof and urgency, not more capabilities.\n`;
+                levers.push(
+                    '1. PROOF POINTS: Run one 2-week pilot, measure time saved, share results',
+                    '2. COMPETITIVE PRESSURE: Document 3 competitors using AI, make threat visible',
+                    '3. QUICK WINS: Solve one universally-hated task, demonstrate pain removal'
+                );
             }
             
-            // Tool-specific insight
-            if (whatHappened === 'dropped-off') {
-                narrative += `• The drop-off pattern tells you this is a workflow integration problem - tools work when used individually but haven't become part of team processes.\n`;
-            } else if (whatHappened === 'champions-only') {
-                narrative += `• Champion-only adoption means you have a knowledge sharing problem - wins aren't scaling beyond the people who figured it out first.\n`;
-            }
+            levers.forEach((lever, i) => {
+                const leverLines = doc.splitTextToSize(lever, 175);
+                doc.setFont(undefined, 'bold');
+                doc.text(leverLines[0], 18, yPos + (i * 12));
+                if (leverLines.length > 1) {
+                    doc.setFont(undefined, 'normal');
+                    doc.text(leverLines.slice(1), 18, yPos + (i * 12) + 5);
+                }
+            });
             
-            narrative += `\nThe next 90 days: If you don't address your ${lowestDimension} gap now, you'll `;
+            // Your First 30 Days
+            yPos = yPos + 40;
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('YOUR FIRST 30 DAYS', 15, yPos);
             
-            if (timeTrying === '12+') {
-                narrative += `spend another year cycling through tools without changing the underlying ${lowestDimension === 'Capability' ? 'skills gap' : lowestDimension === 'Opportunity' ? 'workflow design' : 'motivation issue'}.`;
-            } else {
-                narrative += `end up where teams at the 12+ month mark are: frustrated, skeptical, and stuck at ${whatHappened === 'champions-only' ? '20%' : '50%'} adoption with no clear path forward.`;
-            }
+            yPos = yPos + 6;
+            doc.setFontSize(10);
             
-            return narrative;
+            const weeks = [
+                'Week 1: Pick your highest-impact workflow + assign one owner',
+                'Week 2: Owner maps process, identifies AI integration points',
+                'Week 3: Build/test AI solution, measure time saved',
+                'Week 4: Share results, scale to 2 more team members'
+            ];
+            
+            weeks.forEach((week, i) => {
+                doc.setFont(undefined, 'bold');
+                doc.text(`${week.split(':')[0]}:`, 18, yPos + (i * 7));
+                doc.setFont(undefined, 'normal');
+                doc.text(week.split(':')[1], 40, yPos + (i * 7));
+            });
+            
+            // What to STOP Doing
+            yPos = yPos + 34;
+            doc.setFillColor(254, 226, 226);
+            doc.rect(15, yPos - 4, 180, 24, 'F');
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(...red);
+            doc.text('✗ WHAT TO STOP DOING', 18, yPos + 2);
+            
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(...darkGray);
+            doc.setFontSize(9);
+            
+            const stopDoing = lowestDimension === 'Capability' ? 
+                '• Sending people to generic AI tutorials  • Adding more tools before mastering current ones  • Expecting self-directed learning to work' :
+                lowestDimension === 'Opportunity' ?
+                '• Adding AI to existing workflows  • Expecting people to "find time"  • Blaming tools for workflow problems' :
+                '• Waiting for "better" AI  • Talking about potential without proving results  • Assuming urgency is obvious';
+            
+            const stopLines = doc.splitTextToSize(stopDoing, 175);
+            doc.text(stopLines, 18, yPos + 8);
+            
+            // Session CTA
+            yPos = yPos + 30;
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(...darkGray);
+            doc.text('READY TO BUILD YOUR FULL ROADMAP?', 15, yPos);
+            
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            yPos = yPos + 5;
+            doc.text('Book your diagnostic session to get:', 15, yPos);
+            
+            yPos = yPos + 5;
+            doc.setFontSize(9);
+            const sessionBenefits = [
+                '• 6-Dimension AI-Native Scorecard with visual heatmap',
+                '• Custom Unblocker Strategy for your specific pattern',
+                '• ROI Calculator mapping your exact workflows',
+                '• Cost of Inaction Report quantifying your risks'
+            ];
+            
+            sessionBenefits.forEach((benefit, i) => {
+                doc.text(benefit, 18, yPos + (i * 5));
+            });
+            
+            // Book link
+            yPos = yPos + 24;
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(...purple);
+            doc.textWithLink('→ readiness.expandedfuture.com', 15, yPos, {
+                url: 'https://calendar.app.google/5j3iBjmE8jN9wqXJ7'
+            });
+            
+            // Anti-pitch promise
+            yPos = yPos + 8;
+            doc.setTextColor(...mediumGray);
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'italic');
+            doc.text('This is a diagnostic session, not a sales call. You get the roadmap whether we work together or not.', 15, yPos);
+            
+            // Footer
+            doc.setDrawColor(200, 200, 200);
+            doc.line(15, 285, 195, 285);
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            doc.text('Expanded Future | readiness.expandedfuture.com', 105, 292, { align: 'center' });
+            
+            // Save PDF
+            doc.save(`AI-Readiness-Report-${company.replace(/\s+/g, '-')}.pdf`);
+            
+            // Clear localStorage
+            localStorage.removeItem('aiReadinessDiagnostic');
         }
-
-        function generatePDF(name, company) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
